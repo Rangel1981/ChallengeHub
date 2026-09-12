@@ -10,6 +10,11 @@ from django.utils.encoding import force_bytes, force_str
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.contrib import messages
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from .models import Challenge, CheckIn
 
 from .models import Challenge
 from .forms import ChallengeForm, CustomUserCreationForm
@@ -89,13 +94,13 @@ def activate_account(request, uidb64, token):
         return redirect('home')
 
 
-def login_view(request):
+def login_view(request):    
     if request.method == 'POST':
         form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('challenge_list')
+            return redirect('dashboard')
     else:
         form = AuthenticationForm()
     return render(request, 'challenges/login.html', {'form': form})
@@ -104,3 +109,78 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+@login_required(login_url='login')
+def dashboard(request):
+    user_challenges = Challenge.objects.filter(user=request.user)
+    return render(request, 'challenges/dashboard.html', {'challenges': user_challenges})
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+from .models import Challenge, Participation, CheckIn
+
+def challenge_detail(request, challenge_id):
+    challenge = get_object_or_404(Challenge, id=challenge_id)
+    participation = None
+    has_checked_in_today = False
+
+    if request.user.is_authenticated:
+        # Busca a participação do usuário logado neste desafio (se existir)
+        participation = Participation.objects.filter(user=request.user, challenge=challenge).first()
+        
+        if participation:
+            # Verifica o check-in através da participação encontrada
+            has_checked_in_today = participation.checkins.filter(date=timezone.now().date()).exists()
+
+    context = {
+        'challenge': challenge,
+        'participation': participation,
+        'has_checked_in_today': has_checked_in_today,
+    }
+    return render(request, 'challenges/challenge_detail.html', context)
+
+
+@login_required(login_url='login')
+def checkin_challenge(request, challenge_id):
+    challenge = get_object_or_404(Challenge, id=challenge_id)
+
+    # Busca ou cria a participação do usuário ao tentar fazer o check-in
+    participation, _ = Participation.objects.get_or_create(
+        user=request.user,
+        challenge=challenge
+    )
+
+    today = timezone.now().date()
+    
+    # Registra o check-in na participação do usuário
+    checkin, created = CheckIn.objects.get_or_create(
+        participation=participation, 
+        date=today
+    )
+    
+    if created:
+        messages.success(request, 'Check-in realizado com sucesso! Mandou bem! 🔥')
+    else:
+        messages.info(request, 'Você já fez o check-in de hoje neste desafio.')
+
+    return redirect('challenge_detail', challenge_id=challenge.id)
+
+@login_required(login_url='login')
+def feed(request):
+    # Busca os últimos check-ins públicos para a linha do tempo
+    latest_checkins = CheckIn.objects.filter(
+        participation__challenge__is_public=True
+    ).select_related('participation__user', 'participation__challenge')[:20]
+
+    # Busca os novos desafios públicos criados recentemente
+    recent_challenges = Challenge.objects.filter(
+        is_public=True
+    ).select_related('user')[:5]
+
+    context = {
+        'checkins': latest_checkins,
+        'recent_challenges': recent_challenges,
+    }
+    return render(request, 'challenges/feed.html', context)

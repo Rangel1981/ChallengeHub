@@ -1,0 +1,75 @@
+{% extends 'challenges/base.html' %} {% block title %}Feed da Comunidade -
+ChallengeHub{% endblock %} {% block content %}
+<div class="row g-4">
+  <!-- Coluna Principal: Activity Feed -->
+  <div class="col-lg-8">
+    <h3 class="fw-bold text-dark mb-3">🔥 Feed de Atividades</h3>
+
+    {% if checkins %} {% for checkin in checkins %}
+    <div class="card shadow-sm border-0 mb-3">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-2">
+          <div
+            class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center fw-bold me-2"
+            style="width: 40px; height: 40px"
+          >
+            {{checkin.participation.user.username |slice:":1" |upper}}
+          </div>
+          <div>
+            <h6 class="mb-0 fw-bold text-dark">
+              @{{ checkin.participation.user.username }}
+            </h6>
+            <small class="text-muted">{{checkin.date|date:"d/m/Y"}}</small>
+          </div>
+        </div>
+
+        <p class="card-text mb-2">
+          Completou mais um dia no desafio
+          <a
+            href="{% url 'challenge_detail' checkin.participation.challenge.id %}"
+            class="fw-bold text-danger text-decoration-none"
+          >
+            {{checkin.participation.challenge.title}} </a
+          >! 🎉
+        </p>
+
+        <div class="bg-light p-2 rounded small text-secondary">
+          Meta: {{checkin.participation.completed_days}} de
+          {{checkin.participation.challenge.target_days}} dias concluídos
+          ({{checkin.participation.progress_percentage}}%)
+        </div>
+      </div>
+    </div>
+    {% endfor %} {% else %}
+    <div class="bg-white p-5 rounded text-center shadow-sm">
+      <p class="text-muted mb-0">
+        Nenhuma atividade recente no feed ainda. Seja o primeiro a fazer
+        check-in!
+      </p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Coluna Lateral: Desafios em Destaque -->
+  <div class="col-lg-4">
+    <div class="card shadow-sm border-0 p-3">
+      <h5 class="fw-bold text-dark mb-3">🚀 Novos Desafios</h5>
+      {% for challenge in recent_challenges %}
+      <div class="mb-3 pb-2 border-bottom">
+        <a
+          href="{% url 'challenge_detail' challenge.id %}"
+          class="fw-semibold text-dark text-decoration-none"
+        >
+          {{ challenge.title }}
+        </a>
+        <div class="small text-muted">
+          por @{{ challenge.user.username }} • {{ challenge.target_days }} dias
+        </div>
+      </div>
+      {% empty %}
+      <p class="small text-muted mb-0">Nenhum desafio recente.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

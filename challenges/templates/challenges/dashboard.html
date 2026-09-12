@@ -1,0 +1,76 @@
+{% extends 'challenges/base.html' %} {% block title %}Meu Dashboard -
+ChallengeHub{% endblock %} {% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <div>
+    <h2 class="fw-bold text-dark mb-0">Meu Dashboard</h2>
+    <p class="text-secondary mb-0">
+      Gerencie seus desafios e acompanhe seu progresso.
+    </p>
+  </div>
+  <a href="{% url 'challenge_create' %}" class="btn btn-danger fw-semibold"
+    >+ Novo Desafio</a
+  >
+</div>
+
+{% if challenges %}
+<div class="row g-4">
+  {% for challenge in challenges %}
+  <div class="col-md-6 col-lg-4">
+    <div class="card h-100 shadow-sm border-0">
+      <div class="card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="card-title fw-bold text-dark mb-0">
+            {{ challenge.title }}
+          </h5>
+          {% if challenge.is_public %}
+          <span
+            class="badge bg-success-subtle text-success border border-success-subtle"
+            >Público</span
+          >
+          {% else %}
+          <span
+            class="badge bg-secondary-subtle text-secondary border border-secondary-subtle"
+            >Privado</span
+          >
+          {% endif %}
+        </div>
+
+        <p class="card-text text-secondary small flex-grow-1">
+          {{ challenge.description|truncatewords:15 }}
+        </p>
+
+        <div class="mt-3">
+          <div class="d-flex justify-content-between small text-muted mb-1">
+            <span>Meta: {{ challenge.target_days }} dias</span>
+            <span>0% concluído</span>
+          </div>
+          <div class="progress" style="height: 8px">
+            <div
+              class="progress-bar bg-danger"
+              role="progressbar"
+              style="width: 0%"
+            ></div>
+          </div>
+        </div>
+
+        <div class="mt-3 pt-2 border-top">
+          <a
+            href="{% url 'challenge_detail' challenge.id %}"
+            class="btn btn-outline-dark btn-sm w-100"
+            >Ver Detalhes</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-5 bg-white rounded shadow-sm">
+  <h4 class="fw-bold text-muted">Você ainda não tem nenhum desafio</h4>
+  <p class="text-secondary">Que tal começar um novo desafio agora mesmo?</p>
+  <a href="{% url 'challenge_create' %}" class="btn btn-danger mt-2"
+    >Criar Meu Primeiro Desafio</a
+  >
+</div>
+{% endif %} {% endblock %}
