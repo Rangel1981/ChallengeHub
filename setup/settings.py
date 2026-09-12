@@ -119,7 +119,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
-# Email
+# Email Configuration (Console Backend for Development)
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
 MAILERS = {
@@ -128,12 +128,17 @@ MAILERS = {
     },
 }
 
+DEFAULT_FROM_EMAIL = 'ChallengeHub <noreply@challengehub.com>'
+
+
+# Jazzmin Admin Theme Configuration
+
 JAZZMIN_SETTINGS = {
     "site_title": "ChallengeHub Admin",
     "site_header": "ChallengeHub",
     "site_brand": "ChallengeHub",
     "welcome_sign": "Bem-vindo ao ChallengeHub",
-    "show_ui_builder": True,  # Ativa o menu de engrenagem para mudar cores
+    "show_ui_builder": True,
 }
 
 JAZZMIN_UI_TWEAKS = {
@@ -141,20 +146,20 @@ JAZZMIN_UI_TWEAKS = {
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,
-    "brand_colour": "navbar-danger",       # Vermelho no topo da barra lateral
-    "accent": "accent-danger",              # Detalhes e destaques em vermelho
-    "navbar": "navbar-dark",                # Barra de navegação escura
+    "brand_colour": "navbar-danger",
+    "accent": "accent-danger",
+    "navbar": "navbar-dark",
     "no_navbar_border": False,
     "navbar_fixed": True,
     "layout_boxed": False,
     "footer_fixed": False,
     "sidebar_fixed": True,
-    "sidebar": "sidebar-dark-danger",       # Menu lateral escuro com destaque vermelho
+    "sidebar": "sidebar-dark-danger",
     "sidebar_nav_small_text": False,
-    "theme": "darkly",                      # Tema base (opções: darkly, slate, cyborg, solar, etc)
+    "theme": "darkly",
     "dark_mode_theme": "darkly",
     "button_classes": {
-        "primary": "btn-danger",            # Botões principais vermelhos
+        "primary": "btn-danger",
         "secondary": "btn-secondary",
         "info": "btn-info",
         "warning": "btn-warning",

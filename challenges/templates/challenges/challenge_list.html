@@ -9,18 +9,18 @@ ChallengeHub{%endblock%} {% block content %}
   <div class="col-md-6 col-lg-4 mb-4">
     <div class="card h-100 shadow-sm border-0">
       <div class="card-body d-flex flex-column">
-        <h5 class="card-title fw-bold text-dark">{{ challenge.title }}</h5>
+        <h5 class="card-title fw-bold text-dark">{{challenge.title}}</h5>
         <h6 class="card-subtitle mb-2 text-muted">
-          Criado por @{{ challenge.user.username }}
+          Criado por @{{challenge.user.username}}
         </h6>
         <p class="card-text flex-grow-1 text-secondary">
-          {{ challenge.description|truncatewords:15 }}
+          {{challenge.description|truncatewords:15}}
         </p>
         <div
           class="d-flex justify-content-between align-items-center mt-3 pt-2 border-top"
         >
           <span class="badge bg-secondary"
-            >Meta: {{ challenge.target_days }} dias</span
+            >Meta: {{challenge.target_days}} dias</span
           >
           <a
             href="{% url 'challenge_detail' challenge.id %}"

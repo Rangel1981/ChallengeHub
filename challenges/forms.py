@@ -1,4 +1,6 @@
 from django import forms
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import UserCreationForm
 from .models import Challenge
 
 class ChallengeForm(forms.ModelForm):
@@ -17,3 +19,34 @@ class ChallengeForm(forms.ModelForm):
             'target_days': forms.NumberInput(attrs={'class': 'form-control'}),
             'is_public': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
+
+# Formulário Customizado de Cadastro
+class CustomUserCreationForm(UserCreationForm):
+    first_name = forms.CharField(
+        label='Nome',
+        max_length=30,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Seu primeiro nome'})
+    )
+    last_name = forms.CharField(
+        label='Sobrenome',
+        max_length=150,
+        required=True,
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Seu sobrenome'})
+    )
+    email = forms.EmailField(
+        label='E-mail',
+        required=True,
+        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'seu@email.com'})
+    )
+
+    class Meta(UserCreationForm.Meta):
+        model = User
+        fields = UserCreationForm.Meta.fields + ('first_name', 'last_name', 'email')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Aplica a classe form-control do Bootstrap nos campos padrão (username, passwords)
+        for field in self.fields.values():
+            if 'class' not in field.widget.attrs:
+                field.widget.attrs['class'] = 'form-control'

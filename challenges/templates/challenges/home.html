@@ -10,13 +10,16 @@ Metas em Conquistas{% endblock %} {% block content %}
       coletivos. Defina suas metas, mantenha o foco e evolua diariamente.
     </p>
     <div class="d-grid gap-2 d-md-flex justify-content-md-start">
-      <!-- Botões prontos para conectarmos as telas de Auth em seguida -->
-      <a href="#" class="btn btn-danger btn-lg px-4 me-md-2 fw-semibold"
-        >Criar Conta Grátis</a
+      <!-- Links atualizados com as rotas de Auth -->
+      <a
+        href="{% url 'register' %}"
+        class="btn btn-danger btn-lg px-4 me-md-2 fw-semibold"
       >
-      <a href="#" class="btn btn-outline-secondary btn-lg px-4"
-        >Entrar (Login)</a
-      >
+        Criar Conta Grátis
+      </a>
+      <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">
+        Entrar (Login)
+      </a>
     </div>
   </div>
   <div class="col-lg-6 mt-4 mt-lg-0 text-center">
@@ -26,9 +29,9 @@ Metas em Conquistas{% endblock %} {% block content %}
         Veja os desafios públicos criados por outros usuários e inspire-se para
         começar o seu.
       </p>
-      <a href="{% url 'challenge_list' %}" class="btn btn-outline-danger w-100"
-        >Ver Desafios Públicos</a
-      >
+      <a href="{% url 'challenge_list' %}" class="btn btn-outline-danger w-100">
+        Ver Desafios Públicos
+      </a>
     </div>
   </div>
 </div>
