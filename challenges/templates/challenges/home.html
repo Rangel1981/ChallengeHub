@@ -1,0 +1,35 @@
+{% extends 'challenges/base.html' %} {% block title %}ChallengeHub - Transforme
+Metas em Conquistas{% endblock %} {% block content %}
+<div class="row align-items-center py-5">
+  <div class="col-lg-6">
+    <h1 class="display-4 fw-bold text-dark mb-3">
+      Supere seus limites no <span class="text-danger">ChallengeHub</span>
+    </h1>
+    <p class="lead text-secondary mb-4">
+      A plataforma para você criar, acompanhar e concluir desafios pessoais e
+      coletivos. Defina suas metas, mantenha o foco e evolua diariamente.
+    </p>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+      <!-- Botões prontos para conectarmos as telas de Auth em seguida -->
+      <a href="#" class="btn btn-danger btn-lg px-4 me-md-2 fw-semibold"
+        >Criar Conta Grátis</a
+      >
+      <a href="#" class="btn btn-outline-secondary btn-lg px-4"
+        >Entrar (Login)</a
+      >
+    </div>
+  </div>
+  <div class="col-lg-6 mt-4 mt-lg-0 text-center">
+    <div class="card shadow border-0 p-5 bg-white">
+      <h3 class="fw-bold text-dark mb-3">Explore a Comunidade</h3>
+      <p class="text-muted mb-4">
+        Veja os desafios públicos criados por outros usuários e inspire-se para
+        começar o seu.
+      </p>
+      <a href="{% url 'challenge_list' %}" class="btn btn-outline-danger w-100"
+        >Ver Desafios Públicos</a
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -17,10 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from challenges import views
-
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('challenges/', views.challenge_list, name='challenge_list'),
-    path('challenges/<int:challenge_id>/', views.challenge_detail, name='challenge_detail'),  # Inclui as rotas do app
+    path('', include('challenges.urls')),  
 ]
