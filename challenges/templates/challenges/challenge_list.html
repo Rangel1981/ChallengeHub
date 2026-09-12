@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Desafios - ChallengeHub</title>
+  </head>
+  <body>
+    <h1>Desafios Disponíveis</h1>
+
+    <ul>
+      {% for challenge in challenges %}
+      <li>
+        <a href="{% url 'challenge_detail' challenge.id %}">
+          <strong>{{challenge.title}}</strong>
+        </a>
+        - Criado por {{challenge.user.username}}
+        <p>{{challenge.description}}</p>
+        <small>Meta: {{challenge.target_days}} dias</small>
+      </li>
+      {% empty %}
+      <li>Nenhum desafio público encontrado no momento.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

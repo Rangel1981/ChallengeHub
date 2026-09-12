@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{challenge.title}} - ChallengeHub</title>
+  </head>
+  <body>
+    <a href="{% url 'challenge_list' %}">← Voltar para a lista</a>
+
+    <h1>{{challenge.title}}</h1>
+    <p><strong>Criador:</strong> {{challenge.user.username}}</p>
+    <p><strong>Descrição:</strong> {{challenge.description}}</p>
+    <p><strong>Meta:</strong> {{challenge.target_days}} dias</p>
+    <p><strong>Criado em:</strong> {{challenge.created_at|date:"d/m/Y"}}</p>
+  </body>
+</html>
