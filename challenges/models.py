@@ -80,3 +80,30 @@ class CheckIn(models.Model):
 
     def __str__(self):
         return f"Check-in: {self.participation.user.username} em {self.participation.challenge.title} ({self.date})"
+
+class Comment(models.Model):
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, related_name='comments')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='comments')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='replies')
+    content = models.TextField('comentário')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='criado em')
+
+    class Meta:
+        verbose_name = "Comentário"
+        verbose_name_plural = "Comentários"
+        ordering = ['created_at'] # Ordem cronológica para conversas
+
+    def __str__(self):
+        return f"Comentário de {self.user.username} em {self.challenge.title}"
+
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications') # Quem recebe
+    actor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_notifications') # Quem gerou
+    message = models.CharField(max_length=255)
+    challenge = models.ForeignKey(Challenge, on_delete=models.CASCADE, null=True, blank=True)
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']

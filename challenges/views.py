@@ -14,10 +14,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
-from .models import Challenge, CheckIn
-
-from .models import Challenge
+from .models import Challenge, CheckIn, Comment, Notification, Participation
 from .forms import ChallengeForm, CustomUserCreationForm
+import re
 
 # --- VIEWS DA APLICAÇÃO ---
 
@@ -28,10 +27,14 @@ def challenge_list(request):
     challenges = Challenge.objects.filter(is_public=True)
     return render(request, 'challenges/challenge_list.html', {'challenges': challenges})
 
-def challenge_detail(request, challenge_id):
-    challenge = get_object_or_404(Challenge, id=challenge_id)
-    return render(request, 'challenges/challenge_detail.html', {'challenge': challenge})
-
+def challenge_detail(request, pk):
+    challenge = get_object_or_404(Challenge, pk=pk)
+    # Filtre apenas os comentários principais (parent=None)
+    comments = challenge.comments.filter(parent__isnull=True).order_by('-created_at')
+    return render(request, 'challenges/challenge_detail.html', {
+        'challenge': challenge,
+        'comments': comments,
+    })
 @login_required(login_url='login')
 def challenge_create(request):
     if request.method == 'POST':
@@ -115,11 +118,6 @@ def dashboard(request):
     user_challenges = Challenge.objects.filter(user=request.user)
     return render(request, 'challenges/dashboard.html', {'challenges': user_challenges})
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.utils import timezone
-from .models import Challenge, Participation, CheckIn
 
 def challenge_detail(request, challenge_id):
     challenge = get_object_or_404(Challenge, id=challenge_id)
@@ -127,17 +125,18 @@ def challenge_detail(request, challenge_id):
     has_checked_in_today = False
 
     if request.user.is_authenticated:
-        # Busca a participação do usuário logado neste desafio (se existir)
         participation = Participation.objects.filter(user=request.user, challenge=challenge).first()
-        
         if participation:
-            # Verifica o check-in através da participação encontrada
             has_checked_in_today = participation.checkins.filter(date=timezone.now().date()).exists()
+
+    # Busca apenas os comentários raiz (as respostas vêm através de comment.replies.all)
+    comments = challenge.comments.filter(parent=None).select_related('user').prefetch_related('replies__user')
 
     context = {
         'challenge': challenge,
         'participation': participation,
         'has_checked_in_today': has_checked_in_today,
+        'comments': comments,
     }
     return render(request, 'challenges/challenge_detail.html', context)
 
@@ -184,3 +183,28 @@ def feed(request):
         'recent_challenges': recent_challenges,
     }
     return render(request, 'challenges/feed.html', context)
+
+def add_comment(request, challenge_id):
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        parent_id = request.POST.get('parent_id')
+
+        parent_obj = None
+        if parent_id:
+            parent_obj = Comment.objects.filter(id=parent_id).first()
+
+        Comment.objects.create(
+            challenge_id=challenge_id,
+            user=request.user,  
+            content=content,
+            parent=parent_obj
+        )
+
+    return redirect('challenge_detail', challenge_id)
+
+
+# View para marcar todas as notificações como lidas
+@login_required(login_url='login')
+def mark_notifications_read(request):
+    request.user.notifications.filter(is_read=False).update(is_read=True)
+    return redirect(request.META.get('HTTP_REFERER', 'home'))

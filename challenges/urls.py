@@ -10,6 +10,8 @@ urlpatterns = [
     path('checkin/<int:challenge_id>/', views.checkin_challenge, name='checkin_challenge'),
     path('<int:challenge_id>/checkin/', views.checkin_challenge, name='checkin_challenge'),
     path('feed/', views.feed, name='feed'),
+    path('<int:challenge_id>/comment/', views.add_comment, name='add_comment'),
+    path('notifications/read/', views.mark_notifications_read, name='mark_notifications_read'),
 
     # Rotas de Autenticação
     path('register/', views.register_view, name='register'),

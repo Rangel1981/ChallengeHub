@@ -73,6 +73,109 @@ ChallengeHub{% endblock %} {% block content %}
           >← Voltar para o Dashboard</a
         >
       </div>
+
+      <!-- Seção de Comentários -->
+      <hr class="my-4" />
+      <h4 class="fw-bold text-dark mb-3">
+        💬 Comentários ({{ challenge.comments.count }})
+      </h4>
+
+      {% if user.is_authenticated %}
+      <form
+        method="POST"
+        action="{% url 'add_comment' challenge.id %}"
+        class="mb-4"
+        id="commentForm"
+      >
+        {% csrf_token %}
+        <input type="hidden" name="parent_id" id="parentIdInput" value="" />
+        <div class="mb-2">
+          <textarea
+            id="commentTextarea"
+            name="content"
+            rows="3"
+            class="form-control"
+            placeholder="Deixe uma mensagem de apoio ou mencione alguém com @username..."
+            required
+          ></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger btn-sm fw-semibold">
+          Enviar Comentário
+        </button>
+      </form>
+      {% else %}
+      <p class="text-muted small">
+        <a href="{% url 'login' %}">Faça login</a> para comentar.
+      </p>
+      {% endif %}
+
+      <div class="comments-list">
+        {% for comment in comments %}
+        <!-- Comentário Principal -->
+        <div class="bg-light p-3 rounded mb-2 shadow-sm border">
+          <div class="d-flex justify-content-between align-items-center mb-1">
+            <strong class="text-dark">@{{ comment.user.username }}</strong>
+            <small class="text-muted"
+              >{{ comment.created_at|date:"d/m/Y H:i" }}</small
+            >
+          </div>
+          <p class="mb-2 text-secondary">{{ comment.content }}</p>
+
+          {% if user.is_authenticated %}
+          <button
+            class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-semibold"
+            onclick="replyTo('{{ comment.id }}', '{{ comment.user.username }}')"
+          >
+            ↳ Responder
+          </button>
+          {% endif %}
+
+          <!-- Respostas Encadeadas -->
+          {% if comment.replies.all %}
+          <div class="mt-3 ms-4 border-start ps-3">
+            {% for reply in comment.replies.all %}
+            <div class="bg-white p-2 rounded mb-2 border-sm">
+              <div
+                class="d-flex justify-content-between align-items-center mb-1"
+              >
+                <strong class="text-dark small"
+                  >@{{ reply.user.username }}</strong
+                >
+                <small class="text-muted" style="font-size: 0.75rem"
+                  >{{ reply.created_at|date:"d/m/Y H:i" }}</small
+                >
+              </div>
+              <p class="mb-1 text-secondary small">{{ reply.content }}</p>
+
+              {% if user.is_authenticated %}
+              <!-- Mantém o comment.id como o pai da thread e direciona o @ username da resposta -->
+              <button
+                class="btn btn-link btn-sm text-danger p-0 text-decoration-none fw-semibold"
+                style="font-size: 0.75rem"
+                onclick="replyTo('{{ comment.id }}', '{{ reply.user.username }}')"
+              >
+                ↳ Responder
+              </button>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% empty %}
+        <p class="text-muted small">Nenhum comentário ainda.</p>
+        {% endfor %}
+      </div>
+
+      <script>
+        function replyTo(commentId, username) {
+          document.getElementById("parentIdInput").value = commentId;
+          const textarea = document.getElementById("commentTextarea");
+          textarea.value = `@${username} `;
+          textarea.focus();
+          textarea.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+      </script>
     </div>
   </div>
 </div>
